@@ -1,0 +1,18 @@
+**Introduction to Machine Learning**
+
+    * What is machine learning?
+    * Types of machine learning
+    * Supervised vs. unsupervised learning
+    * Applications of machine learning
+    * Challenges in machine learning
+
+    **Supervised Learning**
+
+    * Regression analysis
+    * Classification
+    * Linear regression
+    * Logistic regression
+    * Decision trees
+    * Random forests
+    * Support vector machines
+    * Neural networks
