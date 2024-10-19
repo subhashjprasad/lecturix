@@ -5,22 +5,21 @@ import { pointsInner, pointsOuter } from "../utils";
 
 const ParticleRing = () => {
   return (
-    <div className="relative">
+    <div className="h-screen w-full relative hero-gradient">
       <Canvas
         camera={{
           position: [10, -7.5, -5],
         }}
-        style={{ height: "100vh" }}
-        className="bg-slate-900"
+        className="bg-slate-900 h-full w-full"
       >
-        <OrbitControls maxDistance={20} minDistance={10} />
+        <OrbitControls enableZoom={false} enablePan={true} />
         <directionalLight />
         <pointLight position={[-30, 0, -30]} power={10.0} />
         <PointCircle />
       </Canvas>
 
-      <h1 className="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] text-slate-200 font-medium text-2xl md:text-5xl pointer-events-none">
-        Drag & Zoom
+      <h1 className="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] text-[#dedde4] text-slate-200 font-medium text-3xl md:text-5xl pointer-events-none" style={{ fontFamily: 'Lucida Console, monospace' }}>
+        Lecturix
       </h1>
     </div>
   );
