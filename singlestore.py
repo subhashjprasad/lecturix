@@ -1,7 +1,8 @@
 import singlestoredb as s2
 from vidgen2 import video_to_blob
 import json
-conn = s2.connect("purav:Testuser1012@svc-3482219c-a389-4079-b18b-d50662524e8a-shared-dml.aws-virginia-6.svc.singlestore.com:3333/db_lecturix_d55ab")
+import os
+conn = s2.connect(os.getenv("SINGLESTORE_URL"))
 
 with conn.cursor() as cur:
     # Commit table creation
