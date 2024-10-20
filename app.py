@@ -509,7 +509,7 @@ def get_user_by_email():
         with conn:
             with conn.cursor() as cur:
                 # SQL Query to fetch the user by email
-                query = 'SELECT user_id, name, email, type, courses FROM Users WHERE email = %s;'
+                query = 'SELECT user_id, name, email, type FROM Users WHERE email = %s;'
                 cur.execute(query, (email,))
                 conn.commit()
 
@@ -522,7 +522,6 @@ def get_user_by_email():
                         'name': user_record[1],
                         'email': user_record[2],
                         'type': user_record[3],
-                        'courses': user_record[4],
                         'message': 'User found'
                     }), 200
                 else:
@@ -542,15 +541,13 @@ def create_course():
     try:
         with conn.cursor() as cur:
             query = '''
-                INSERT INTO Courses (course_name, professor, students, join_code, videos)
-                VALUES (%s, %s, %s, %s, %s);
+                INSERT INTO Courses (course_name, professor, join_code)
+                VALUES (%s, %s, %s);
             '''
             cur.execute(query, (
                 data['course_name'], 
                 data['professor'], 
-                json.dumps(data.get('students', [])),  # Default to an empty list
                 data.get('join_code', ''), 
-                json.dumps(data.get('videos', []))  # Default to an empty list
             ))
             conn.commit()
             return jsonify({'message': 'Course created successfully'}), 201
