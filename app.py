@@ -464,11 +464,11 @@ def add_student():
             with conn:
                 with conn.cursor() as cur:
                     query = '''
-                    INSERT INTO Users (name, email, type, courses)
+                    INSERT INTO Users (name, email, type)
                     VALUES (%s, %s, %s, %s);
                     '''
                     print('got here 1')
-                    cur.execute(query, (data['name'], data['email'], "Student", json.dumps(data['courses'])))
+                    cur.execute(query, (data['name'], data['email'], "Student"))
                     print('got here2')
                     conn.commit()
                     print('got here 3')
@@ -488,10 +488,10 @@ def add_teacher():
             with conn:
                 with conn.cursor() as cur:
                     query = '''
-                    INSERT INTO Users (name, email, type, courses)
+                    INSERT INTO Users (name, email, type)
                     VALUES (%s, %s, %s, %s);
                     '''
-                    cur.execute(query, (data['name'], data['email'], "Teacher", json.dumps(data['courses'])))
+                    cur.execute(query, (data['name'], data['email'], "Teacher"))
 
                     conn.commit()
                     
