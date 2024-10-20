@@ -8,6 +8,7 @@ from cartesia import Cartesia
 import ffmpeg
 import json
 from moviepy.editor import TextClip, CompositeVideoClip, ColorClip, VideoFileClip, AudioFileClip, concatenate_videoclips, ImageClip
+from moviepy.decorators import apply_to_audio, apply_to_mask, requires_duration
 import importlib.util
 import moviepy.editor as mp
 import tempfile
@@ -36,7 +37,7 @@ genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-pro")
     
 # create script from lecture notes
-input_type = "pdf"
+input_type = "text"
 
 prompt = "Create a detailed and comprehensive college-level lecture based on these notes. The lecture should be no more than 200 words in length. Remove any unnecessary formatting (that isn't part of an equation), like * and # symbols NO MATTER WHAT."
 
@@ -50,9 +51,9 @@ elif (input_type == "txt"):
     lecture_notes = read_file_content("notes.txt")
 elif (input_type == "text"): 
     lecture_notes = """
-    Chemistry is the scientific discipline that studies matter, its properties, and the changes it undergoes during chemical reactions. As the central science, chemistry bridges physics with other natural sciences, such as biology and geology, by explaining the behavior of atoms and molecules that constitute the physical world. One of the most fundamental concepts in chemistry is the understanding of atoms, the basic building blocks of matter. Atoms consist of a nucleus made up of protons and neutrons, surrounded by electrons in orbitals. The arrangement of these subatomic particles and the way atoms bond with each other determine the properties and behaviors of all substances.
+    Physics is the branch of science that seeks to understand the fundamental principles governing the universe, including matter, energy, and their interactions. It covers a broad range of phenomena, from the motion of everyday objects to the behavior of particles at the atomic level. The field of physics is divided into various branches, such as classical mechanics, which deals with the motion of objects under the influence of forces, and electromagnetism, which explores the behavior of electric and magnetic fields and their effects on matter. Thermodynamics studies the transfer of heat and the relationship between energy and work, while quantum mechanics delves into the strange behavior of particles at the subatomic scale, where the classical laws of physics no longer apply. Physics also includes relativity, which explains how space and time are interconnected, particularly at high speeds and in strong gravitational fields, as outlined by Einstein's theory of general relativity.
 
-    Matter can exist in various states—solid, liquid, gas, and plasma—depending on the temperature and pressure. The phase of a substance is determined by the movement and arrangement of its atoms or molecules. Solids have a fixed structure, with atoms or molecules closely packed in a regular pattern, while liquids have a definite volume but no fixed shape, allowing particles to flow. Gases have neither a fixed shape nor volume, with particles moving freely and widely spaced. Plasma, the fourth state of matter, consists of highly energized particles and occurs naturally in stars, including the sun.
+    At its core, physics seeks to explain the laws of nature through observation, experimentation, and mathematical models. It applies principles such as Newton's laws of motion, which describe how forces cause changes in an object's velocity, and the law of conservation of energy, which states that energy cannot be created or destroyed, only transformed from one form to another. Physics is also the foundation for many technological advances, from the development of electricity and magnetism in the 19th century to the modern advancements in particle physics and cosmology. In addition, physics provides insights into the nature of the universe, from the behavior of planets and stars to the origins of the cosmos itself. Through its study, we gain a deeper understanding of how the world works, helping us develop technologies that shape our modern society.
     """
 else:
     # return jsonify({"error": "invalid input type"}), 400
@@ -147,15 +148,17 @@ current_time = 0.0
 # If only a static figure is appropriate, create the figure and save it using plt.savefig('static_slide_{slide_number}.png') and set is_animation = False.
 # The code should be self-contained and executable as is.
 # If no suitable figure or animation can be generated, simply return 'no'.'''
-prompt1 = "Given the following script segment, determine whether a visual/diagram/animation would help explain the concept. If yes, output 'yes', and if not, output 'no'"
+prompt1 = "Given the following script segment, determine whether a visual/diagram/animation would help explain the concept. If yes, output 'yes'. If there is any risk of generating complex visualizations with potentially erroneous code (e.g., due to dimensionality mismatches or difficult-to-manage animations), output 'no'. Avoid generating overly complex or error-prone visualizations such as 3D scatter plots or animations that depend on non-standard data. If the concept requires such complexity, return 'no' for that slide."
 
 prompt2 = '''Given the following script segment, generate self-contained Python code that creates a corresponding animation using Matplotlib. The animation must be very relevant to the concept in the script. The code should:
 Include all necessary imports and variable definitions.
 The code must be executable via the built-in exec() function in Python.
 Do not include plt.show().
 Ensure that all variables used within functions are properly defined and accessible.
+Ensure that all arrays or data structures used in the animation are checked for shape mismatches and appropriate indexing.
 Define an animation object named ani using FuncAnimation in a form similar to: ani = FuncAnimation(fig, update, frames=len(x), init_func=init, blit=True).
 The code should be self-contained and executable as is.
+Ensure that any data used in the animation (e.g., arrays like X, y) is generated in a way that guarantees compatibility between different functions (e.g., make sure all arrays have matching shapes). If using random data, ensure the same seed is used for consistency.
 Do not add any other comments or any form of explanations or alternatives.'''
 
 animations = []
@@ -177,7 +180,7 @@ for ind, slide in enumerate(data):
                 {"role": "system", "content": prompt2},
                 {
                     "role": "user",
-                    "content": "DO NOT ADD ANY COMMENTS OR EXTRA CODE SUCH AS plt.show(). Make sure graphs or animations are unique and displayed properly. The graphs and animations must be fully accurate to the script. The animations/graphs MUST correspond with the concept. Also, do NOT use the exec() function or execute anything within the code. Avoid sin or cos graphs unless it is absolutely relevant to the content. Use 3D graphs when necessary. If you cannot generate any relevant graphs/animations, create some relevant slide content using matplotlib. Here is the Script: " + slide['script'],
+                    "content": "Ensure that any data used in the animation (e.g., arrays like X, y) is generated in a way that guarantees compatibility between different functions (e.g., make sure all arrays have matching shapes). If using random data, ensure the same seed is used for consistency. Ensure that all arrays or data structures used in the animation are checked for shape mismatches and appropriate indexing. DO NOT ADD ANY COMMENTS OR EXTRA CODE SUCH AS plt.show(). Make sure graphs or animations are unique and displayed properly. The graphs and animations must be fully accurate to the script. The animations/graphs MUST correspond with the concept. Also, do NOT use the exec() function or execute anything within the code. Avoid sin or cos graphs unless it is absolutely relevant to the content. Use 3D graphs when necessary. If you cannot generate any relevant graphs/animations, create some relevant slide content using matplotlib. Here is the Script: " + slide['script'],
                 }
             ]
         )
@@ -260,7 +263,7 @@ def create_animated_slide(text, slide_number, duration=5):
     final_clip = CompositeVideoClip([background, txt_clip])
     
     # Save the slide as an individual video clip
-    output = f"temp/slide_{slide_number}.mp4"
+    output = f"C:/Users/subha/code/lecturix/slide_{slide_number}.mp4"
     final_clip.write_videofile(output, fps=24, codec='libx264')
     return output
 
@@ -286,11 +289,11 @@ if 'y' not in locals():
 
     # Final code to execute
     final_code = imports + additional_vars + cleaned_code + f'''
-ani.save("temp/animation_slide_{slide_number}.mp4", writer='ffmpeg', fps=24)
+ani.save("C:/Users/subha/code/lecturix/animation_slide_{slide_number}.mp4", writer='ffmpeg', fps=24)
 plt.close()
     '''
     
-    output_file = f"temp/animation_slide_{slide_number}.mp4"
+    output_file = f"C:/Users/subha/code/lecturix/animation_slide_{slide_number}.mp4"
     
     # Try to execute the final code
     try:
@@ -310,10 +313,22 @@ plt.close()
         loop_video_to_duration(output_file, duration)
         return output_file  # Return the output video file
     except Exception as e:
-        # print(f"Error running animation for slide {slide_number}: {e}")
+        print(f"Error running animation for slide {slide_number}: {e}")
         # If there's an error, generate a fallback slide
         return create_animated_slide(fallback, slide_number, duration)
     
+@requires_duration
+@apply_to_mask
+@apply_to_audio
+def time_mirror(self):
+    """
+    Returns a clip that plays the current clip backwards.
+    The clip must have its ``duration`` attribute set.
+    The same effect is applied to the clip's audio and mask if any.
+    """
+    duration_per_frame = 1 / self.fps
+    return self.fl_time(lambda t: np.max(self.duration - t - duration_per_frame, 0), keep_duration=True)
+
 def loop_video_to_duration(video_path, target_duration):
     """ Loops the video file to match the target duration by repeating it if necessary. """
     # Load the video using moviepy
@@ -323,6 +338,8 @@ def loop_video_to_duration(video_path, target_duration):
     if video.duration < target_duration:
         # Calculate how many times the video needs to be repeated
         looped_video = video.loop(duration=target_duration)
+
+        looped_video = time_mirror(looped_video)
         
         # Write the final looped video to the file
         looped_video.write_videofile(video_path, codec="libx264", fps=24)
@@ -362,25 +379,12 @@ def create_video_from_animated_slides(slide_videos, timestamps, audio_file, outp
     # Write the final video to file
     final_video.write_videofile(output_file, fps=24)
 
-
-def pad_to_duration(animation_video, slide_image, duration):
-    # Check how much time is left after the animation ends
-    remaining_duration = duration - animation_video.duration
-    
-    # Get the last frame of the animation
-    last_frame = animation_video.get_frame(animation_video.duration)
-    
-    # Create an ImageClip with the last frame and set the duration to remaining time
-    freeze_frame_clip = ImageClip(last_frame).set_duration(remaining_duration)
-    
-    # Concatenate the original animation and the frozen last frame
-    return concatenate_videoclips([animation_video, freeze_frame_clip])
-
 # Process the slides and animations
 slide_videos = []
 for index, (slide, animation_code) in enumerate(zip(data, animations)):
     duration = timestamps[index + 1][1] - timestamps[index][1] if index < len(timestamps) - 1 else 0
 
+    print(animation_code)
     if animation_code.strip() == 'no':
         slide_video = create_animated_slide(slide['slide'], index + 1, duration)
     else:
