@@ -1,0 +1,32 @@
+html, body {
+    margin: 0; /* Remove default margins */
+    height: 100%; /* Ensure body and html take full height */
+}
+
+.about-us {
+    background-color: #0C1325; /* Purple background color */
+    min-height: 100vh; /* Make sure it fills the entire viewport */
+    padding: 50px; /* Padding for overall layout */
+    text-align: center; /* Center text */
+    font-family: 'Courier New', Courier, monospace; /* Typewriter font */
+    color: white
+}
+
+.about-us h1 {
+    font-size: 2.5rem; /* Heading size */
+    margin-bottom: 20px; /* Space below heading */
+    color: #fff; /* White text color for contrast */
+}
+
+.typewriter {
+    display: inline-block; /* Keep the text inline */
+    border-right: 2px solid #fff; /* Typewriter cursor effect */
+    white-space: normal; /* Allow text to wrap */
+    animation: blink 0.7s infinite; /* Cursor blink effect */
+    max-width: 100%; /* Limit width to container */
+}
+
+@keyframes blink {
+    0%, 100% { border-color: transparent; }
+    50% { border-color: #fff; } /* White cursor for contrast */
+}

@@ -1,0 +1,66 @@
+import React, { useEffect, useRef } from 'react';
+import './ProblemSolution.css'; // Import the CSS file for animations
+
+
+const ProblemSolution = () => {
+  const problemRef = useRef(null);
+  const solutionRef = useRef(null);
+
+
+  useEffect(() => {
+    const options = {
+      root: null, // Use the viewport as the root
+      threshold: 0.1, // Trigger when 10% of the element is visible
+    };
+
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Add the slide-in-right class when the section comes into view
+          entry.target.classList.add('slide-in-right');
+        }
+      });
+    }, options);
+
+
+    if (problemRef.current) {
+      observer.observe(problemRef.current);
+    }
+    if (solutionRef.current) {
+      observer.observe(solutionRef.current);
+    }
+
+
+    return () => {
+      if (problemRef.current) observer.unobserve(problemRef.current);
+      if (solutionRef.current) observer.unobserve(solutionRef.current);
+    };
+  }, []);
+
+
+  return (
+    <div className="grid grid-cols-2 gap-x-10 gap-y-14 px-20 py-12 w-full bg-[#dedde4]">
+      {/* Row 1: Left - Problem, Right - Details */}
+      <div ref={problemRef} className="flex items-center">
+        <h2 className="text-6xl text-[#dedde4] md:text-8xl problem-heading font-bold uppercase" style={{ fontFamily: 'Lucida Console, monospace' }}>
+          The Problem
+        </h2>
+      </div>
+      <div ref={solutionRef} className="flex items-center">
+        <p className="text-2xl md:text-2xl leading-snug text-slate-700"
+        style={{ fontFamily: 'Lucida Console, monospace' }}>
+          Students, have you ever missed a class before and not have any material to learn from?
+          <br />
+          Professors, have you ever just wanted to turn your notes into videos for students to have supplementary resources?
+        </p>
+      </div>
+    </div>
+  );
+};
+
+
+export default ProblemSolution;
+
+
+
