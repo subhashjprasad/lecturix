@@ -9,7 +9,9 @@ const Header = () => {
       <div className="my-auto text-xl font-bold leading-none">Lecturix</div>
       <nav className="flex text-l leading-none">
         <a href="#about" className="my-auto">About</a>
-        <img loading="lazy" src="google.png" alt="" className="object-contain shrink-0 aspect-[4.37] w-[175px]" />
+        <a href="/login">
+          <img loading="lazy" src="google.png" alt="Google" className="object-contain shrink-0 aspect-[4.37] w-[175px]" />
+        </a>
       </nav>
     </header>
   );
