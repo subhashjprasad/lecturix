@@ -465,7 +465,7 @@ def add_student():
                 with conn.cursor() as cur:
                     query = '''
                     INSERT INTO Users (name, email, type)
-                    VALUES (%s, %s, %s, %s);
+                    VALUES (%s, %s, %s);
                     '''
                     print('got here 1')
                     cur.execute(query, (data['name'], data['email'], "Student"))
@@ -489,7 +489,7 @@ def add_teacher():
                 with conn.cursor() as cur:
                     query = '''
                     INSERT INTO Users (name, email, type)
-                    VALUES (%s, %s, %s, %s);
+                    VALUES (%s, %s, %s);
                     '''
                     cur.execute(query, (data['name'], data['email'], "Teacher"))
 
