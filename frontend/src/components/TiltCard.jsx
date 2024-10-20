@@ -1,5 +1,7 @@
 import React, { useRef } from "react";
 import DottedButton from "./DottedButton";
+import { useAuth0 } from "@auth0/auth0-react";
+
 import {
   motion,
   useMotionTemplate,
@@ -8,11 +10,12 @@ import {
 } from "framer-motion";
 
 const Example = () => {
+  const { user, isAuthenticated, isLoading } = useAuth0();
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 to-[#0C1325] pr-3 py-12 text-slate-900">
       <TiltCard />
       <div className="flex flex-col justify-center items-center mt-4"> {/* Margin added for spacing */}
-        <h1 className="text-4xl font-bold text-white mb-4">Teacher Name</h1>
+        <h1 className="text-4xl font-bold text-white mb-4">{user.name}</h1>
         <DottedButton />
       </div>
     </div>
@@ -23,6 +26,7 @@ const ROTATION_RANGE = 32.5;
 const HALF_ROTATION_RANGE = ROTATION_RANGE / 2;
 
 const TiltCard = () => {
+  
   const ref = useRef(null);
 
   const x = useMotionValue(0);
