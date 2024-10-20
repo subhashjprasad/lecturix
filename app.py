@@ -1,3 +1,4 @@
+import io
 from flask import Flask, request, jsonify, send_file
 import os
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ import ffmpeg
 import json
 from moviepy.editor import TextClip, CompositeVideoClip, ColorClip, VideoFileClip, AudioFileClip, concatenate_videoclips
 import moviepy.editor as mp
+from moviepy.decorators import apply_to_audio, apply_to_mask, requires_duration
 import numpy as np
 import importlib.util
 import tempfile
