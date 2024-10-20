@@ -47,10 +47,20 @@ const Solution = () => {
           Create lecture videos from class lecture notes!
         </p>
         {/* Video below */}
-        <video width="600" controls>
+        <iframe
+        width="560"
+        height="315"
+        src={`https://www.youtube.com/embed/P8GujiW2kBM`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+
+        {/* <video width="600" controls>
           <source src="https://youtu.be/P8GujiW2kBM" type="video/mp4" />
           Your browser does not support the video tag.
-        </video>
+        </video> */}
       </div>
       
       {/* Right side content */}
