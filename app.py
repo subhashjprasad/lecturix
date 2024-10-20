@@ -739,6 +739,7 @@ def join_course():
 
     except Exception as e:
         conn.rollback()
+        print(e)
         return jsonify({'error': str(e)}), 500
     finally:
         conn.close()
