@@ -36,27 +36,23 @@ model = genai.GenerativeModel("gemini-1.5-pro")
     
 @app.route("/generate-lecture-video", methods=["GET", "POST"])
 def generate_lecture():
-    if request.method == 'POST':
-        # Handle POST request
-        return jsonify({"message": "Video generation started"})
-    elif request.method == 'GET':
-        # Handle GET request (if necessary)
-        return jsonify({"message": "Use POST to submit data"})
     input_data = request.json
 
     # create script from lecture notes
-    input_type = "text"
+    # input_type = "text"
+    input_type = input_data.get("input_type")
+    notes_file = input_data.get("notes_file")
 
-    prompt = "Create a detailed and comprehensive college-level lecture based on these notes. The lecture should be no more than 200 words in length. Remove any unnecessary formatting (that isn't part of an equation), like * and # symbols."
+    prompt = "Create a detailed and comprehensive college-level lecture based on these notes. The lecture should be no more than 200 words in length. Remove any unnecessary formatting (that isn't part of an equation), like * and # symbols. Do not repeat content beyond simply recapping it in the conclusion."
 
     if (input_type == "png"):
-        lecture_notes = PIL.Image.open("notes.png")
+        lecture_notes = PIL.Image.open(notes_file)
     elif (input_type == "jpg"):
-        lecture_notes = PIL.Image.open("notes.jpg")
+        lecture_notes = PIL.Image.open(notes_file)
     elif (input_type == "pdf"):
-        lecture_notes = read_pdf_content("notes.pdf")
+        lecture_notes = read_pdf_content(notes_file)
     elif (input_type == "txt"):
-        lecture_notes = read_file_content("notes.txt")
+        lecture_notes = read_file_content(notes_file)
     elif (input_type == "text"): 
         lecture_notes = """
         Physics is the study of matter, energy, and the fundamental forces of nature. At its core, physics seeks to understand how the universe behaves, from the smallest particles to the largest galaxies. One of the fundamental concepts in physics is Newton's Laws of Motion, which describe the relationship between a body and the forces acting upon it. Newton's first law, often called the law of inertia, states that an object will remain at rest or in uniform motion unless acted upon by a force. His second law defines force as the product of mass and acceleration (F = ma), while the third law famously states that every action has an equal and opposite reaction.
@@ -69,6 +65,7 @@ def generate_lecture():
         """
     else:
         return jsonify({"error": "invalid input type"}), 400
+
 
     print("creating script")
     response = model.generate_content(
@@ -171,7 +168,7 @@ def generate_lecture():
     Do not add any other comments or any form of explanations or alternatives.'''
 
     animations = []
-    for slide in data:
+    for ind, slide in enumerate(data):
         print("creating diagram for slide")
         # query for animation (or 'no')
         response = model.generate_content(
@@ -194,7 +191,7 @@ def generate_lecture():
                 ]
             )
 
-            print(completion.choices[0].message.content)
+            # print(completion.choices[0].message.content)
             # response = model.generate_content(
             #     [prompt2, slide['script']],
             #     generation_config=genai.typesw.GenerationConfig(
@@ -211,6 +208,7 @@ def generate_lecture():
 
         # Generate and stream audio
         total_bytes_written = 0
+        print("script:", slide['script'])
         if not custom_voice:
             for output in ws.send(
                 model_id=model_id,
@@ -242,6 +240,11 @@ def generate_lecture():
         # Update the current time to reflect the end of this slide's audio
         current_time += duration
 
+        if ind == len(data) - 1:
+            timestamps.append((slide['slide'], current_time))
+
+    print(timestamps)
+
     # Close the connection to release resources
     ws.close()
     f.close()
@@ -253,10 +256,10 @@ def generate_lecture():
 
     def create_animated_slide(text, slide_number, duration=5):
         # Create a background clip
-        background = ColorClip(size=(1280, 720), color=(255, 255, 255), duration=duration)  # White background
+        background = ColorClip(size=(1280, 720), color=(255, 255, 255), duration=duration) # white background
         
         # Create a TextClip with animation
-        txt_clip = TextClip(text, fontsize=70, color='black', size=(1280, 720))  # Text in black
+        txt_clip = TextClip(text, fontsize=70, color="blue", font="Ubuntu-Regular.ttf", size=(1280, 720))  # Text in blue
         txt_clip = txt_clip.set_position('center').set_duration(duration)
         
         # Add fade-in and fade-out effects for smooth transitions
@@ -266,11 +269,11 @@ def generate_lecture():
         final_clip = CompositeVideoClip([background, txt_clip])
         
         # Save the slide as an individual video clip
-        output = f"slide_{slide_number}.mp4"
+        output = f"temp/slide_{slide_number}.mp4"
         final_clip.write_videofile(output, fps=24, codec='libx264')
         return output
 
-    def run_animation(animation_code, slide_number, duration):
+    def run_animation(animation_code, slide_number, duration, fallback):
         # Clean the animation code to remove any backticks or language specifiers
         cleaned_code = animation_code.replace("```python", "").replace("```", "").strip()
 
@@ -292,11 +295,11 @@ def generate_lecture():
 
         # Final code to execute
         final_code = imports + additional_vars + cleaned_code + f'''
-    ani.save("animation_slide_{slide_number}.mp4", writer='ffmpeg', fps=24)
+    ani.save("temp/animation_slide_{slide_number}.mp4", writer='ffmpeg', fps=24)
     plt.close()
         '''
         
-        output_file = f"animation_slide_{slide_number}.mp4"
+        output_file = f"temp/animation_slide_{slide_number}.mp4"
         
         # Try to execute the final code
         try:
@@ -313,49 +316,91 @@ def generate_lecture():
             finally:
                 # Clean up the temporary file
                 os.remove(module_path)
+            loop_video_to_duration(output_file, duration)
             return output_file  # Return the output video file
         except Exception as e:
-            print(f"Error running animation for slide {slide_number}: {e}")
+            # print(f"Error running animation for slide {slide_number}: {e}")
             # If there's an error, generate a fallback slide
-            return create_animated_slide(f"Slide {slide_number} (Failed Animation)", slide_number, duration)
+            return create_animated_slide(fallback, slide_number, duration)
+        
+    def loop_video_to_duration(video_path, target_duration):
+        """ Loops the video file to match the target duration by repeating it if necessary. """
+        # Load the video using moviepy
+        video = mp.VideoFileClip(video_path)
+        
+        # If the video duration is shorter than the target duration, loop it
+        if video.duration < target_duration:
+            # Calculate how many times the video needs to be repeated
+            looped_video = video.loop(duration=target_duration)
+            
+            # Write the final looped video to the file
+            looped_video.write_videofile(video_path, codec="libx264", fps=24)
+        
+        # Close the video to free up resources
+        video.close()
 
 
-    def create_video_from_animated_slides(slide_videos, audio_file, output_file):
-        # Load all the individual slide videos and specify the FPS manually
-        video_clips = [VideoFileClip(slide, fps_source='fps').set_duration(5) for slide in slide_videos]
+    def create_video_from_animated_slides(slide_videos, timestamps, audio_file, output_file):
+        # Initialize a list for timed video clips
+        timed_clips = []
 
-        # Concatenate all the slides
-        final_video = concatenate_videoclips(video_clips, method="compose")
+        # Iterate through the slide videos and their corresponding timestamps
+        for index, (slide_video, (slide, start_time)) in enumerate(zip(slide_videos, timestamps)):
+            print("video", index)
+            # Load the slide video
+            video_clip = VideoFileClip(slide_video)
+            
+            # Set the start and end times based on the timestamp
+            start_time = timestamps[index][1]
+            end_time = timestamps[index + 1][1] if index + 1 < len(timestamps) else video_clip.duration + start_time
+
+            # Adjust the video clip duration to match the required time range
+            video_clip = video_clip.set_start(start_time).set_duration(end_time - start_time)
+            
+            # Add to the list of timed clips
+            timed_clips.append(video_clip)
+
+        # Concatenate all the timed slides
+        final_video = concatenate_videoclips(timed_clips, method="compose")
 
         # Load the audio and set it for the video
         if audio_file:
             audio = AudioFileClip(audio_file)
             final_video = final_video.set_audio(audio)
 
-        # Write the final video
+        # Write the final video to file
         final_video.write_videofile(output_file, fps=24)
+
+
+    def pad_to_duration(animation_video, slide_image, duration):
+        # Check how much time is left after the animation ends
+        remaining_duration = duration - animation_video.duration
+        
+        # Get the last frame of the animation
+        last_frame = animation_video.get_frame(animation_video.duration)
+        
+        # Create an ImageClip with the last frame and set the duration to remaining time
+        freeze_frame_clip = ImageClip(last_frame).set_duration(remaining_duration)
+        
+        # Concatenate the original animation and the frozen last frame
+        return concatenate_videoclips([animation_video, freeze_frame_clip])
 
     # Process the slides and animations
     slide_videos = []
-    print(timestamps)
     for index, (slide, animation_code) in enumerate(zip(data, animations)):
-        print("making animation")
-        print(animation_code)
-        duration = timestamps[index + 1][1] - timestamps[index][1] if index < len(timestamps) - 1 else 20
-        
+        duration = timestamps[index + 1][1] - timestamps[index][1] if index < len(timestamps) - 1 else 0
+
         if animation_code.strip() == 'no':
-            # Create a slide if no animation is provided
             slide_video = create_animated_slide(slide['slide'], index + 1, duration)
         else:
-            # Run the provided animation code
-            slide_video = run_animation(animation_code, index + 1, duration)
-        
+            slide_video = run_animation(animation_code, index + 1, duration, slide['slide'])
+
         slide_videos.append(slide_video)
 
-    create_video_from_animated_slides(slide_videos, "sonic.wav", "final_lecture_video.mp4")
+    create_video_from_animated_slides(slide_videos, timestamps, "sonic.wav", "final_lecture_video.mp4")
 
-    for slide in slide_videos:
-        os.remove(slide)
+    # for slide in slide_videos:
+    #     os.remove(slide)
 
     def video_to_blob(video_file_path):
         # Open the video file in binary read mode
