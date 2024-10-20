@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import DottedButton from "./DottedButton";
+import DottedJoinButton from "./DottedJoinButton";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import {
@@ -8,38 +8,24 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import CreateClass from "./CreateClass";
 
 const Example = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 to-[#0C1325] pr-3 py-12 text-slate-900">
-      <TiltCard />
+      <StudentTiltCard />
       <div className="flex flex-col justify-center items-center mt-4"> {/* Margin added for spacing */}
         <h1 className="text-4xl font-bold text-white mb-4">{user.name}</h1>
-        <div className="flex space-x-4"> {/* Add this div for horizontal layout with spacing */}
-          <DottedButton />
-          <CreateClass />
-        </div>
+        <DottedJoinButton />
       </div>
     </div>
   );
-//   return (
-//     <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 to-[#0C1325] pr-3 py-12 text-slate-900">
-//       <TiltCard />
-//       <div className="flex flex-col justify-center items-center mt-4"> {/* Margin added for spacing */}
-//         <h1 className="text-4xl font-bold text-white mb-4">{user.name}</h1>
-//         <DottedButton />
-//         <CreateClass />
-//       </div>
-//     </div>
-//   );
 };
 
 const ROTATION_RANGE = 32.5;
 const HALF_ROTATION_RANGE = ROTATION_RANGE / 2;
 
-const TiltCard = () => {
+const StudentTiltCard = () => {
   
   const ref = useRef(null);
 
@@ -97,7 +83,7 @@ const TiltCard = () => {
           }}
           className="text-center text-2xl font-bold"
         >
-          Welcome to the Teacher Portal!
+          Welcome to the Student Portal!
         </p>
       </div>
     </motion.div>

@@ -5,6 +5,8 @@ import HomePage from './HomePage';
 import Teacher from './components/Teacher';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
 import LectureVideos from './components/LectureVideos.jsx';
+import Student from './components/Student.jsx';
+import AboutUs from './components/AboutUs.jsx';
 
 function App() {
   return (
@@ -12,48 +14,34 @@ function App() {
       <Routes>
         {/* Define routes for different pages/components */}
         <Route path="/" element={<HomePage />} /> {/* Home Page route */}
-        <Route path="/teacher" element={<ProtectedRoute element={<Teacher />} />} /> {/* Protected Teacher Page route */}
-        <Route path="/lectures/:id" element={<ProtectedRoute element={<LectureVideos />} />} />      </Routes>
+        <Route path="/teacher" element={<ProtectedRoute element={<Teacher />} />} /> 
+        <Route path="/lectures/:id" element={<ProtectedRoute element={<LectureVideos />} />} /> 
+        <Route path="/student" element={<ProtectedRoute element={<Student />} />} /> 
+        <Route path="/about" element={<AboutUs />} />
+      </Routes>
     </Router>
-    //<Videos />
   );
 }
 
 export default App;
 
-// import React, { useState } from 'react';
+// import React from 'react';
 // import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // import './App.css';
 // import HomePage from './HomePage';
-// import Teacher from './components/Teacher';
-// import ProtectedRoute from './components/ProtectedRoute';
-// import LecVids from './components/LecVids.jsx';
+// import Teacher from './components/Teacher'; // Check if Teacher.jsx has a default export
+// import Student from './components/Student'; // Check if Student.jsx has a default export
+// import ProtectedRoute from './components/ProtectedRoute'; // Check if ProtectedRoute.jsx has a default export
+// import LectureVideos from './components/LectureVideos'; // Check if LectureVideos.jsx has a default export
 
 // function App() {
-//   const [folderClicked, setFolderClicked] = useState(false); // State to track folder click
-
 //   return (
 //     <Router>
 //       <Routes>
 //         <Route path="/" element={<HomePage />} />
-//         {/* Passing setFolderClicked as prop to Teacher to handle folder clicks */}
-//         <Route path="/teacher" 
-//           element={
-//             <ProtectedRoute 
-//               element={<Teacher setFolderClicked={setFolderClicked} />} 
-//             />
-//           } 
-//         />
-//         {/* Protect LecVids route based on folder click and authentication */}
-//         <Route path="/lecvids" 
-//           element={
-//             <ProtectedRoute 
-//               element={<LecVids />} 
-//               condition={folderClicked} // Pass folderClicked as a condition
-//               redirectTo="/teacher" // Redirect to teacher page if folder not clicked
-//             />
-//           } 
-//         />
+//         <Route path="/teacher" element={<ProtectedRoute element={<Teacher />} />} />
+//         <Route path="/student" element={<ProtectedRoute element={<Student />} />} />
+//         <Route path="/lectures/:id" element={<ProtectedRoute element={<LectureVideos />} />} />
 //       </Routes>
 //     </Router>
 //   );
