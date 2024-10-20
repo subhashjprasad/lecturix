@@ -12,7 +12,7 @@ const Header = () => {
       <a className="my-4"href="/"><div className="my-auto text-xl font-bold leading-none">Lecturix</div></a>
       <nav className="flex text-l leading-none">
       <Link to="/about">
-          <button className="my-auto bg-black text-white px-4 my-3 mr-2 py-2 rounded-md hover:bg-gray-600 transition duration-300">
+          <button className="mt-3 bg-black text-white px-4 my-3 mr-2 py-2 rounded-md hover:bg-gray-600 transition duration-300">
             About
           </button>
         </Link>
