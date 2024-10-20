@@ -1,19 +1,19 @@
 import React, { useRef } from "react";
-import TiltCard from './TiltCard.jsx';
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
 import PeopleLayout from "./PeopleLayout.jsx";
 import HoverDevCards from "./HoverDevCards.jsx";
+import StudentTiltCard from './StudentTiltCard.jsx'
 
 // Teacher component
-const Teacher = () => {
+const Student = () => {
   return (
     <PeopleLayout>
-      <TiltCard />
+      <StudentTiltCard />
       <HoverDevCards />
     </PeopleLayout>
   );
 };
 
 
-export default Teacher;
+export default Student;
