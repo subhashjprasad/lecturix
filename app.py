@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_file
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from flask_cors import CORS
 import PIL.Image
 import PyPDF2
 from cartesia import Cartesia
@@ -33,6 +34,8 @@ def read_file_content(filepath):
 load_dotenv()
 
 app = Flask(__name__)
+
+CORS(app)
 
 openclient = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
