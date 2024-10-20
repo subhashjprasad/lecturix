@@ -34,8 +34,14 @@ openclient = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-pro")
     
-@app.route("/generate-lecture-video", methods=["POST"])
+@app.route("/generate-lecture-video", methods=["GET", "POST"])
 def generate_lecture():
+    if request.method == 'POST':
+        # Handle POST request
+        return jsonify({"message": "Video generation started"})
+    elif request.method == 'GET':
+        # Handle GET request (if necessary)
+        return jsonify({"message": "Use POST to submit data"})
     input_data = request.json
 
     # create script from lecture notes
