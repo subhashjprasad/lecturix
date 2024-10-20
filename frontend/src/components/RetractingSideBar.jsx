@@ -1,16 +1,8 @@
 import React, { useState } from "react";
-import {
-  FiBarChart,
-  FiChevronDown,
-  FiChevronsRight,
-  FiDollarSign,
-  FiHome,
-  FiMonitor,
-  FiShoppingCart,
-  FiTag,
-  FiUsers,
-} from "react-icons/fi";
+import { FiHome, FiUsers, FiChevronsRight } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react"; // Import Auth0
 
 export const Example = () => {
   return (
@@ -24,6 +16,16 @@ export const Example = () => {
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
   const [selected, setSelected] = useState("Dashboard");
+
+  let navigate = useNavigate();
+  const { logout } = useAuth0(); // Destructure the logout function from Auth0
+
+  const handleSignOut = () => {
+    // Auth0 sign-out and redirect to home
+    logout({
+      returnTo: window.location.origin, // Redirect to the home page
+    });
+  };
 
   return (
     <motion.nav
@@ -44,47 +46,12 @@ const Sidebar = () => {
           open={open}
         />
         <Option
-          Icon={FiDollarSign}
-          title="Sales"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-          notifs={3}
-        />
-        <Option
-          Icon={FiMonitor}
-          title="View Site"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={FiShoppingCart}
-          title="Products"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={FiTag}
-          title="Tags"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={FiBarChart}
-          title="Analytics"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
           Icon={FiUsers}
-          title="Members"
+          title="Sign Out"
           selected={selected}
           setSelected={setSelected}
           open={open}
+          onClick={handleSignOut} // Trigger sign-out action here
         />
       </div>
 
@@ -93,12 +60,19 @@ const Sidebar = () => {
   );
 };
 
-const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
+const Option = ({ Icon, title, selected, setSelected, open, onClick }) => {
   return (
     <motion.button
       layout
-      onClick={() => setSelected(title)}
-      className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-indigo-100 text-indigo-800" : "text-slate-500 hover:bg-slate-100"}`}
+      onClick={() => {
+        setSelected(title);
+        if (onClick) onClick(); // If there's an onClick handler, call it
+      }}
+      className={`relative flex h-10 w-full items-center rounded-md transition-colors ${
+        selected === title
+          ? "bg-indigo-100 text-indigo-800"
+          : "text-slate-500 hover:bg-slate-100"
+      }`}
     >
       <motion.div
         layout
@@ -117,30 +91,16 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
           {title}
         </motion.span>
       )}
-
-      {notifs && open && (
-        <motion.span
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-          }}
-          style={{ y: "-50%" }}
-          transition={{ delay: 0.5 }}
-          className="absolute right-2 top-1/2 size-4 rounded bg-indigo-500 text-xs text-white"
-        >
-          {notifs}
-        </motion.span>
-      )}
     </motion.button>
   );
 };
 
 const TitleSection = ({ open }) => {
+  let navigate = useNavigate();
   return (
     <div className="mb-3 border-b border-slate-300 pb-3">
-      <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-slate-100">
-        <div className="flex items-center gap-2">
+      <div className="flex cursor-pointer items-center justify-between rounded-md transition-color">
+        <div className="flex items-center gap-2" onClick={() => navigate("/")}>
           <Logo />
           {open && (
             <motion.div
@@ -148,20 +108,15 @@ const TitleSection = ({ open }) => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
-            >
-              <span className="block text-xs font-semibold">TomIsLoading</span>
-              <span className="block text-xs text-slate-500">Pro Plan</span>
-            </motion.div>
+            ></motion.div>
           )}
         </div>
-        {open && <FiChevronDown className="mr-2" />}
       </div>
     </div>
   );
 };
 
 const Logo = () => {
-  // Temp logo from https://logoipsum.com/
   return (
     <motion.div
       layout
