@@ -1,0 +1,46 @@
+.slide-in-left {
+    -webkit-animation: slide-in-left 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    animation: slide-in-left 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+  }
+  
+  /* Keyframes for slide-in-left */
+  @-webkit-keyframes slide-in-left {
+    0% {
+      -webkit-transform: translateX(-1000px); /* Start off-screen to the left */
+              transform: translateX(-1000px);
+      opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(0); /* End at the original position */
+              transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slide-in-left {
+    0% {
+      -webkit-transform: translateX(-1000px); /* Start off-screen to the left */
+              transform: translateX(-1000px);
+      opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(0); /* End at the original position */
+              transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  
+  /* Existing problem-heading styling */
+  .problem-heading {
+    color: #DEDDE4; /* Text color */
+    -webkit-text-stroke: 2px black; /* Black outline for WebKit browsers */
+    text-stroke: 2px black; /* For other browsers that support it */
+  }
+  
+  /* Fallback for browsers that don't support text-stroke */
+  @supports (-webkit-text-stroke: 4px black) or (text-stroke: 2px black) {
+    .problem-heading {
+      text-shadow: none;
+    }
+  }
