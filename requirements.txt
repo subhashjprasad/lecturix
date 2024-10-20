@@ -51,6 +51,7 @@ google-generativeai @ git+https://github.com/google-gemini/generative-ai-python@
 googleapis-common-protos==1.65.0
 grpcio==1.67.0
 grpcio-status==1.67.0
+gunicorn==23.0.0
 h11==0.14.0
 HEIC2PNG==1.1.4
 httpcore==1.0.6
