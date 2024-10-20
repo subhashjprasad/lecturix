@@ -4,7 +4,7 @@ import './App.css';
 import HomePage from './HomePage';
 import Teacher from './components/Teacher';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
-import LecVids from './components/LecVids.jsx';
+import LectureVideos from './components/LectureVideos.jsx';
 
 function App() {
   return (
@@ -13,8 +13,7 @@ function App() {
         {/* Define routes for different pages/components */}
         <Route path="/" element={<HomePage />} /> {/* Home Page route */}
         <Route path="/teacher" element={<ProtectedRoute element={<Teacher />} />} /> {/* Protected Teacher Page route */}
-        <Route path="/lecvids" element={<LecVids />} />
-      </Routes>
+        <Route path="/lectures/:id" element={<ProtectedRoute element={<LectureVideos />} />} />      </Routes>
     </Router>
     //<Videos />
   );
