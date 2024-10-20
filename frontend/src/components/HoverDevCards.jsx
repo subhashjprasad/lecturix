@@ -1,8 +1,11 @@
+
+
 import React, { useEffect, useState } from "react";
 import { FiCreditCard, FiMail, FiUser, FiUsers } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const HoverDevCards = () => {
-    const [cardData, setCardData] = useState([{'title': "ICS 33", 'code': "123456"}, {'title': "ICS 45C", 'code': "234233"}]);
+    const [cardData, setCardData] = useState([{'id': 1,'title': "ICS 33", 'code': "123456"}, {'id': 2,'title': "ICS 45C", 'code': "234233"}]);
     return (
         <div className="p-4">
           <p className="text-xl font-semibold mb-2">Classes</p>
@@ -14,6 +17,7 @@ const HoverDevCards = () => {
                 title={card.title}
                 Icon={FiCreditCard}  
                 code={card.code}
+                id={card.id}
             />
             ))}
           </div>
@@ -21,11 +25,12 @@ const HoverDevCards = () => {
       );
 };
 
-const Card = ({ title, Icon, code}) => {
+const Card = ({ title, Icon, code, id}) => {
+    let navigate = useNavigate()
   return (
     <button
       className="w-full p-4 rounded border-[1px] border-slate-300 relative overflow-hidden group bg-white"
-      onClick={() => {}}
+      onClick={() => {navigate(`/lectures/${id}`, { state: { title, code } })}}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
 
